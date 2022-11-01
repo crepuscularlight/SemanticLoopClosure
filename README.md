@@ -1,9 +1,9 @@
 # SemanticLoopClosure
 Master thesis regarding LiDAR-based semantic loop closure.
 
-![](/home/liudiyang/ms/SemanticLoopClosure/assets/README/ezgif.com-gif-maker(5).gif)
+![](./assets/README/loop1.gif)
 
-![](/home/liudiyang/ms/SemanticLoopClosure/assets/README/ezgif.com-gif-maker(3).gif)
+![](./assets/README/loop2.gif)
 
 ## Introduction
 
