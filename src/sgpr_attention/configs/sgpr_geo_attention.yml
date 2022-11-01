@@ -1,0 +1,37 @@
+common:
+  model: SGPR_Geo_Attention
+  dataset: SemanticKittiBboxROS
+  trainer: SGPRTrainer
+  exp_name: SGPR_Geo_Attention_mindata_all
+  ckpt_path: experiments/sgpr-debug/test/4_best.pth #ckpts/best.pth
+  graphs_dir: /home/liudiyang/ms/dataset/semantickitti_bbox/graphs
+  pairs_dir: /home/liudiyang/ms/dataset/SG_PR_DATA/train/3_20
+  eval_pairs_dir: /home/liudiyang/ms/dataset/SG_PR_DATA/eval/3_20
+
+arch:
+  filters_dim: [64,64,32]
+  tensor_neurons: 16
+  bottle_neck_neurons: 16
+  K: 10
+
+train:
+  gpu: 0
+  epoch: 50
+  batch_size: 128
+  train_sequences: ['01',"03","04","09","10"] #['00','01',"02","03","04","05","06","07","09","10"]
+  eval_sequences: ["08"]
+  dropout: 0.05
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  node_num: 50
+  number_of_labels: 12
+  geo_output_channels: 6
+  p_thresh: 3
+
+test:
+  test_pairs_dir: /content/drive/MyDrive/master_thesis/google_colab/Data_pcn/eval/3_20
+  test_sequences: ["02"] #["00","02","05","06","07","08"]
+  pair_file: ["./data/001499.npz","./data/000714.npz"]
+
+
+
