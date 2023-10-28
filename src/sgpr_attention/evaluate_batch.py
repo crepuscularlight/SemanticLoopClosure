@@ -31,7 +31,6 @@ def main():
     ckpt_path=tmp+"/best.pth"
 
     
-    # print(ckpt_path)
 
     model = get_model()[cfg.model](cfg)
     state_dict = torch.load(ckpt_path)
@@ -94,10 +93,6 @@ def main():
         fpr, tpr, roc_thresholds = metrics.roc_curve(gt_db, pred_db)
 
         roc_auc = metrics.auc(fpr, tpr)
-        # print("fpr: ", fpr)
-        # print("tpr: ", tpr)
-        # print("thresholds: ", roc_thresholds)
-        # print("roc_auc: ", roc_auc)
 
         # plot ROC Curve
         plt.figure()

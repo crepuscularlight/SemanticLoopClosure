@@ -1,4 +1,5 @@
 import torch
+
 class SimpleAttentionModule(torch.nn.Module):
 
     def __init__(self, args):
@@ -48,38 +49,7 @@ class SimpleAttentionModule(torch.nn.Module):
         representation = torch.matmul(embedding.permute(0, 2, 1), weights)  # [B,f,N]x[B,N,1] -> [B,f,1]
 
         return representation, None
-# class MultiheadAttentionModule(torch.nn.Module):
-#     """
-#     SimGNN Attention Module to make a pass on graph.
-#     """
 
-#     def __init__(self, args):
-#         """
-#         :param args: Arguments object.
-#         """
-#         super().__init__()
-#         self.args = args
-#         self.filters_last = args.filters_dim[-1]
-
-#         self.attention_layer=torch.nn.MultiheadAttention(self.filters_last,8,batch_first=True)
-#     def forward(self, embedding):
-#         """
-#         Making a forward propagation pass to create a graph level representation.
-#         :param embedding: Result of the GCN. [B,N,32]
-#         :return representation: A graph level representation vector.
-#         """
-
-#         batch_size = embedding.shape[0]
-#         # global_context = torch.mean(torch.matmul(embedding, self.weight_matrix), dim=1)  # [B,N,32] [32,32]->[B,N,32] ->[B,32]
-#         global_context=self.attention_layer(embedding,embedding,embedding)[0]
-#         global_context=torch.mean(global_context,dim=1)
-
-#         transformed_global = torch.tanh(global_context)  # [B,32]
-#         # transformed_global = torch.nn.functional.tanh(global_context)  # [B,32]
-#         sigmoid_scores = torch.sigmoid(torch.matmul(embedding, transformed_global.view(batch_size, -1,1))) #[B,N,32]x[B,32,1]->[B,N,1]
-#         representation = torch.matmul(embedding.permute(0, 2, 1), sigmoid_scores)  # [B,32,N] x[B,N,1] -> [B,32,1]
-
-#         return representation, sigmoid_scores
 class MultiheadAttentionModule(torch.nn.Module):
     """
     SimGNN Attention Module to make a pass on graph.
@@ -154,11 +124,7 @@ class MeanMultiheadAttentionModule(torch.nn.Module):
         representation=torch.cat((global_context,mean_context),dim=2) #[B,32,2]
 
         representation=torch.matmul(representation,self.a)
-        # # transformed_global = torch.nn.functional.tanh(global_context)  # [B,32]
-        # # embedding=embedding.permute(0,2,1)
-        # sigmoid_scores = torch.sigmoid(torch.matmul(embedding, transformed_global.view(batch_size, -1,1))) #[B,N,32]x[B,32,1]->[B,N,1]
-        # representation = torch.matmul(embedding.permute(0, 2, 1), sigmoid_scores)  # [B,32,N] x[B,N,1] -> [B,32,1]  # [B,f,N]x[B,N,1] -> [B,f,1]
-        # print(global_context.shape)
+
         return representation, None
 
 class AttentionModule(torch.nn.Module):
@@ -305,6 +271,7 @@ class DiffTensorNetworkModule(torch.nn.Module):
         difference=torch.matmul(self.difference_matrix,difference) #[16,32]x[B,32,1] -> [B,16,1]
         scores = torch.nn.functional.relu(scoring + block_scoring + self.bias+difference) #[B,16,1]+[B,16,1]+[16,1]->[B,16,1]
         return scores
+        
 class DiffDiffTensorNetworkModule(torch.nn.Module):
     """
     SimGNN Tensor Network module to calculate similarity vector.

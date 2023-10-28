@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from sgpr_attention.src.models.components.dgcnn import get_attention_feature
 from sgpr_attention.src.models.components.layers_batch import AttentionModule, TensorNetworkModule, DiffDiffTensorNetworkModule,MultiheadAttentionModule
+
 class Refined_GAT(nn.Module):
     # input [B,N,k,2d]
     def __init__(self,input_channels,output_channels,k=10):
@@ -22,7 +23,6 @@ class Refined_GAT(nn.Module):
         B, N, k, f = x.shape
         h_origin=torch.squeeze(x[:,:,0,:f//2],dim=2)
         hw=torch.matmul(x[:,:,:,f//2:],self.weights) #[B,N,k,d]x[d,d]->[B,N,k,d]
-        # tmp=nn.functional.leaky_relu(hw,negative_slope=0.2)
         tmp=hw
         hwa=torch.matmul(tmp,self.a) #[B,N,k,d]x[d,1]->[B,N,k,1]
         weight = nn.functional.softmax(hwa, dim=2).permute(0, 1, 3, 2)  # [B,N,k,1]->[B,N,1,k]
@@ -35,6 +35,7 @@ class Refined_GAT(nn.Module):
         out = out.permute(0, 2, 1)  # [B,32,N]
 
         return out
+
 class GAT(nn.Module):
 # get graph attention feature [B,N,k,2f]
     def __init__(self,input_channels,output_channels,k=10):
@@ -136,10 +137,6 @@ class SGPR_Geo_Attention_Attention_Fusion(nn.Module):
         self.center_conv = Graph_Attention(self.cfg, 3)
         self.sem_conv = Graph_Attention(self.cfg, self.cfg.number_of_labels)
 
-        # self.dgcnn_conv_end = nn.Sequential(nn.Conv1d(self.cfg.filters_dim[-1] * 3,  # 3
-        #                                               self.cfg.filters_dim[-1], kernel_size=1, bias=False),
-        #                                     nn.BatchNorm1d(self.cfg.filters_dim[-1]), nn.LeakyReLU(negative_slope=0.2))
-
         self.attention_fuse = nn.MultiheadAttention(96, 8, batch_first=True,dropout=0.05)
         self.pooling_layer=nn.AvgPool1d(3,3)
 
@@ -158,34 +155,16 @@ class SGPR_Geo_Attention_Attention_Fusion(nn.Module):
         xyz = xyz.permute((0, 2, 1))  # [B,50,32]
         sem = sem.permute((0, 2, 1))
         geo=geo.permute((0,2,1))
-        # geo=torch.unsqueeze(geo,dim=1)
-        # xyz=torch.unsqueeze(xyz,dim=1)
-        # sem=torch.unsqueeze(sem,dim=1)
 
-        # print(geo.shape)
-        # x = torch.cat((geo,xyz), dim=1)
         fuse = torch.cat((geo, xyz, sem), dim=2)
         fuse = self.attention_fuse(fuse, fuse, fuse)[0]  # [B,50,64]
-
-        # print("x1 shape",x.shape)
-        # x=self.fusion_conv(x)
-
-        # x=self.fusion_conv_1(x)
-        # print("x shape",x.shape)
-        # x=torch.squeeze(x,dim=1)
-        # x=torch.cat((x,sem),dim=1)
         fuse=self.pooling_layer(fuse)
-        # x = self.dgcnn_conv_end(x)
-        # print(x.shape)
-        # x = x.permute(0, 2, 1)  # [node_num, 32]
-        x=fuse
 
-        return x
+        return fuse
 
     def forward(self, data):
         features_1 = data["features_1"].cuda()
         features_2 = data["features_2"].cuda()  # [B,1024+3+12,N]
-        # print("features shape",features_1.shape)
         B, _, N = features_1.shape
 
         # features B x (3+label_num) x node_num

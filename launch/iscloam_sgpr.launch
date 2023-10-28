@@ -2,7 +2,6 @@
 <launch>
     <node pkg="iscloam" type="loopGeneration.py" name="loopGeneration" output="screen"/>
 
-    <!-- <include file="$(find iscloam)/launch/iscloam.launch"/> -->
     <node pkg="timed_roslaunch" type="timed_roslaunch.sh" args="6 $(find iscloam)/launch/iscloam.launch" name="timed_roslaunch" output="screen" />
 
 </launch>

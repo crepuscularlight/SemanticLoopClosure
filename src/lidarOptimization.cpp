@@ -31,6 +31,7 @@ std::map<int, int> label_map = {
     {81, 19},
     {99, 0}};
 
+//adjust this according to experiments.
 std::vector<double> label_weight = {0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 0.4, 1., 1., 1., 1., 1., 1., 1.2, 1.2, 1.2, 1.2, 1.2};
 
 EdgeAnalyticCostFunction::EdgeAnalyticCostFunction(Eigen::Vector3d curr_point_, Eigen::Vector3d last_point_a_, Eigen::Vector3d last_point_b_)
